@@ -46,7 +46,7 @@ ou utilize o Docker Desktop para iniciar o back-end.
 ```bash
 educara/
 │
-├── aplicativo/        # Código fonte do App Educara FULL
+├── app/               # Código fonte do App Educara FULL
 │
 ├── servicos/          # Código fonte de um back-end básico
 └── README.md          # Documentação do projeto
