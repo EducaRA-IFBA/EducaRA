@@ -48,7 +48,7 @@ educara/
 │
 ├── app/               # Código fonte do App Educara FULL
 │
-├── servicos/          # Código fonte de um back-end básico
+├── servicos/          # Código fonte do Back-end
 └── README.md          # Documentação do projeto
 ```
 
