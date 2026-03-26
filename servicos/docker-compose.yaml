@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+# Serviço Web do Nginx para os arquivos estáticos
+  webserver-static:
+    container_name: webserver-static
+    build:
+      context: ./static
+      dockerfile: Dockerfile
+    ports:
+      - '8009:80'
+    volumes:
+      - './static/html:/usr/share/nginx/html'
+
+# Serviço de banco de dados com PostgreSQL
+  database:
+    container_name: database
+    image: postgres
+    hostname: database
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}      
+    ports:
+      - "5432:5432"
+
+  # Serviço do Laravel 10
+  # O host 'database' se refere ao nome do servico do banco de dados, descrito acima
+  api:
+    container_name: api
+    build:
+      args:
+          user: user
+          uid: 1000
+      context: ./api
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: ${DATABASE_HOST}
+      DB_PORT: ${DATABASE_PORT}
+      DB_DATABASE: ${DATABASE_NAME}
+      DB_USERNAME: ${DATABASE_USERNAME}
+      DB_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${API_JWT_SECRET}
+      APP_KEY: ${API_APP_KEY}    
+    ports:
+      - '9000:80'
+    volumes:
+      - ./api/src:/var/www/html
+      - ./api/src/storage/logs:/var/www/html/storage/logs
+    working_dir: /var/www/html
+    depends_on:
+      - database

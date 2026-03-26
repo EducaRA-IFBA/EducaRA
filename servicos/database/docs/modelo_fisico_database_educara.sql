@@ -1,0 +1,55 @@
+/* modelo_logico_database_educara: */
+
+CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    email_verified_at TIMESTAMP NULL,
+    password VARCHAR(255) NOT NULL,
+    type VARCHAR(255) DEFAULT 'Aluno',
+    remember_token VARCHAR(100) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE disciplinas (
+    id BIGSERIAL PRIMARY KEY,
+    codigo UUID NOT NULL,
+    nome VARCHAR(255) NOT NULL,
+    sigla VARCHAR(255) NOT NULL,
+    imagem VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE aulas (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    codigo UUID NOT NULL,
+    observacao VARCHAR(255) NOT NULL,
+    turma VARCHAR(255) NOT NULL,
+    dono_id BIGINT NOT NULL,
+    disciplina_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL,
+    FOREIGN KEY (dono_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (disciplina_id) REFERENCES disciplinas (id) ON DELETE CASCADE
+);
+
+CREATE TABLE conteudos (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao VARCHAR(255) NULL,
+    imagem VARCHAR(255) NULL,
+    filehash VARCHAR(255) NULL,
+    caminho VARCHAR(255) NULL,
+    size INTEGER DEFAULT 0,
+    escala NUMERIC(6, 2) DEFAULT 0.3,
+    codigo UUID NOT NULL,
+    extension VARCHAR(255) NULL,
+    aula_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (aula_id) REFERENCES aulas (id) ON DELETE CASCADE
+);
