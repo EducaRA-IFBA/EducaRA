@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador 3D</title>
+    <style>
+        :root {
+            --theme-color: #2196f3;
+            --theme-color-soft: #2196f3;
+            --theme-color-soft-hover: #1976d2;
+            --theme-color-active: #0d47a1;
+            --theme-color-shadow: rgba(33, 150, 243, 0.45);
+            --theme-color-border: #2196f3;
+        }
+        body { margin: 0; overflow: hidden; background-color: #808080; }
+        canvas { display: block; }
+        #uiOverlay {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #paletteOverlay {
+            position: absolute;
+            left: 50%;
+            bottom: 18px;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 10px;
+            padding: 6px;
+            background: transparent;
+            border-radius: 30px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+        }
+        .color-btn {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+            transition: transform 0.12s ease;
+        }
+        .color-btn:active {
+            transform: scale(0.88);
+        }
+        .action-btn {
+            width: 46px;
+            height: 46px;
+            border: 2px solid var(--theme-color-border);
+            background: var(--theme-color-soft);
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px var(--theme-color-shadow);
+            transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.2s ease;
+        }
+        .action-btn:hover {
+            background: var(--theme-color-soft-hover);
+        }
+        .action-btn:active {
+            transform: scale(0.92);
+            background: var(--theme-color-active);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+    </style>
+</head>
+<body>
+    <div id="uiOverlay">
+        <button class="action-btn" onclick="setZoom(1.5)">+</button>
+        <button class="action-btn" onclick="setZoom(0.7)">−</button>
+    </div>
+
+    <div id="paletteOverlay">
+        <button class="color-btn" style="background: #2196f3" onclick="setBackgroundColor('#2196f3')"></button>
+        <button class="color-btn" style="background: #ff5722" onclick="setBackgroundColor('#ff5722')"></button>
+        <button class="color-btn" style="background: #4caf50" onclick="setBackgroundColor('#4caf50')"></button>
+        <button class="color-btn" style="background: #9c27b0" onclick="setBackgroundColor('#9c27b0')"></button>
+        <button class="color-btn" style="background: #ffeb3b" onclick="setBackgroundColor('#ffeb3b')"></button>
+    </div>
+
+    <script src="threejs/three.min.js"></script>
+    <script src="threejs/OrbitControls.js"></script>
+    <script src="threejs/GLTFLoader.js"></script>
+    <script>
+        let scene, camera, renderer, model, controls;
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x808080);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 1.2, 2.8);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // Configuração de luz reforçada para cores mais vivas e realismo
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
+            scene.add(ambientLight);
+
+            const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1.1);
+            directionalLight1.position.set(5, 10, 7);
+            directionalLight1.castShadow = true;
+            scene.add(directionalLight1);
+
+            const directionalLight2 = new THREE.DirectionalLight(0x80afff, 0.5);
+            directionalLight2.position.set(-5, 5, -3);
+            scene.add(directionalLight2);
+
+            const directionalLight3 = new THREE.DirectionalLight(0xffd8b0, 0.3);
+            directionalLight3.position.set(0, 5, -5);
+            scene.add(directionalLight3);
+
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.1;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.08;
+            controls.enableZoom = true;
+            controls.zoomSpeed = 1.1;
+            controls.enablePan = false;
+            controls.minDistance = 0.4;
+            controls.maxDistance = 20;
+
+            const modelPath = Android.getModelPath();
+            if (modelPath) {
+                loadModel(modelPath);
+            } else {
+                console.warn('Nenhum caminho de modelo informado no Android.getModelPath()');
+            }
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        function loadModel(path) {
+            const loader = new THREE.GLTFLoader();
+            const finalPath = path.startsWith('file://') ? path : 'file://' + path;
+
+            loader.load(
+                finalPath,
+                function (gltf) {
+                    if (model) scene.remove(model);
+                    model = gltf.scene;
+
+                    const box = new THREE.Box3().setFromObject(model);
+                    const size = box.getSize(new THREE.Vector3());
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = maxDim > 0 ? 1 / maxDim : 1;
+                    model.scale.set(scale, scale, scale);
+
+                    box.setFromObject(model);
+                    box.getCenter(model.position).multiplyScalar(-1);
+
+                    scene.add(model);
+
+                    // Ajustar câmera após carga
+                    const center = box.getCenter(new THREE.Vector3());
+                    controls.target.copy(center);
+                    controls.update();
+                },
+                function (xhr) {
+                    // progresso opcional
+                },
+                function (error) {
+                    console.error('Erro ao carregar modelo GLB:', error);
+                }
+            );
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (controls) controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function resetView() {
+            if (!model) return;
+            camera.position.set(0, 1.2, 2.8);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        }
+
+        function setZoom(factor) {
+            camera.position.setLength(camera.position.length() * (1 / factor));
+            controls.update();
+        }
+
+        function setBackgroundColor(color) {
+            const colorObj = new THREE.Color(color);
+            scene.background = colorObj;
+            renderer.setClearColor(colorObj, 1);
+        }
+
+        init();
+    </script>
+</body>
+</html>

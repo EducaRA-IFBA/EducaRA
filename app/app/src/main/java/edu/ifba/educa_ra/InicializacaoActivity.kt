@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.ar.core.ArCoreApk
 import edu.ifba.educa_ra.telas.SelecaoActivity
-import edu.ifba.educa_ra.api.IsAlive
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.concurrent.timerTask

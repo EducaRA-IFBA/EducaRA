@@ -14,9 +14,9 @@ import java.net.URL
 import java.util.zip.ZipFile
 import kotlin.reflect.KFunction1
 
-//const val URL_SERVICOS = "http://192.168.0.105"
 const val PORTA_SERVICOS = "9000"
 const val URL_SERVICOS = "http://10.0.2.2:$PORTA_SERVICOS/api/v1"
+//const val URL_SERVICOS = "http://10.249.205.215:$PORTA_SERVICOS/api/v1"
 
 const val URL_ALIVE = "$URL_SERVICOS/alive"
 const val URL_DISCIPLINAS = "$URL_SERVICOS/disciplinas"
@@ -25,6 +25,9 @@ const val URL_CONTEUDOS = "$URL_SERVICOS/conteudos"
 
 const val PORTA_OBJETOS = "8009"
 const val URL_OBJETOS = "http://10.0.2.2:$PORTA_OBJETOS"
+//const val URL_OBJETOS = "http://10.249.205.215:$PORTA_OBJETOS"
+
+const val TIMEOUT = 4000
 
 fun toJson(stream: InputStream): String {
     val json = StringBuilder()
@@ -44,8 +47,8 @@ fun isAlive(): Boolean {
     try {
         val url = URL(URL_ALIVE)
         val conn = url.openConnection() as HttpURLConnection
-        conn.connectTimeout = 2000
-        conn.readTimeout = 2000
+        conn.connectTimeout = TIMEOUT
+        conn.readTimeout = TIMEOUT
 
         val json = toJson(conn.inputStream)
         val resposta = JSONObject(json)
@@ -109,8 +112,10 @@ class GetDisciplinas(private val onDisciplinas: KFunction1<List<DisciplinaModelo
             if (isAlive()) {
                 val url = URL(URL_DISCIPLINAS)
                 val conn = url.openConnection() as HttpURLConnection
-                val json = toJson(conn.inputStream)
+                conn.connectTimeout = TIMEOUT
+                conn.readTimeout = TIMEOUT
 
+                val json = toJson(conn.inputStream)
                 val itens = JSONObject(json).getJSONArray("disciplinas")
                 disciplinas = toDisciplinaModelo(itens)
             }
@@ -157,8 +162,10 @@ class GetAulas(private val idDisciplina: String, private val onAulas: KFunction1
             if (isAlive()) {
                 val url = URL("$URL_AULAS/$idDisciplina")
                 val conn = url.openConnection() as HttpURLConnection
-                val json = toJson(conn.inputStream)
+                conn.connectTimeout = TIMEOUT
+                conn.readTimeout = TIMEOUT
 
+                val json = toJson(conn.inputStream)
                 val itens = JSONObject(json).getJSONArray("aulas")
                 aulas = toAulas(itens)
             }
@@ -208,8 +215,10 @@ class GetConteudos(private val idAula: String, private val onConteudos: KFunctio
             if (isAlive()) {
                 val url = URL("$URL_CONTEUDOS/$idAula")
                 val conn = url.openConnection() as HttpURLConnection
-                val json = toJson(conn.inputStream)
+                conn.connectTimeout = TIMEOUT
+                conn.readTimeout = TIMEOUT
 
+                val json = toJson(conn.inputStream)
                 val itens = JSONObject(json).getJSONArray("conteudos")
                 conteudos = toConteudos(itens)
             }

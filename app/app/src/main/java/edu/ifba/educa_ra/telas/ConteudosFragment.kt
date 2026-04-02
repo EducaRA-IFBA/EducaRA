@@ -174,7 +174,7 @@ class ConteudosAdapter() :
 
         val disponibilidade = ArCoreApk.getInstance().checkAvailability(this.contexto)
         if (disponibilidade.isSupported) {
-            if (disponibilidade == ArCoreApk.Availability.SUPPORTED_INSTALLED) {
+            if (disponibilidade != ArCoreApk.Availability.SUPPORTED_INSTALLED) {
                 val visualizador = Intent(activity, VisualizadorARCoreActivity::class.java)
                 activity?.startActivity(visualizador)
             } else  {

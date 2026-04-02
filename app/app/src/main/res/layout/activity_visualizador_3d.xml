@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     tools:context=".visualizador3D.Visualizador3DActivity">
 
-    <SurfaceView
-        android:id="@+id/area_visualizacao_3D"
+    <WebView
+        android:id="@+id/webView3D"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
