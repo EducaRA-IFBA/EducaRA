@@ -3,24 +3,38 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use App\Models\Disciplina;
+use App\Models\Aula;
+use App\Models\Usuario;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
 
-        \App\Models\User::factory(10)->create();
-
-        \App\Models\User::factory()->create([
+        $usuario = Usuario::create([
             'name' => 'EducaRA',
             'email' => 'educara@gmail.com',
-            'password' => bcrypt('password')
+            'password' => bcrypt('password') 
         ]);
 
-        \App\Models\Disciplina::factory(7)->create();
+        $donoId = $usuario->id;
 
-        \App\Models\Aula::factory(7)->create();
+        $quimica = Disciplina::create([
+            'nome' => 'Química Orgânica',
+            'sigla' => 'QUI',
+            'codigo' => (string) Str::uuid(),
+            'imagem' => 'Padrão',
+            'dono_id' => $donoId
+        ]);
 
-        \App\Models\Conteudo::factory(6)->create();
+        Aula::create([
+            'nome' => 'Introdução aos Hidrocarbonetos',
+            'dono_id' => $donoId,
+            'disciplina_id' => $quimica->id,
+            'observacao' => 'Estudo das estruturas moleculares de carbono e hidrogênio.',
+            'turma' => '3º Ano A'
+        ]);
     }
 }

@@ -20,6 +20,7 @@ class AulaResource extends JsonResource
             'codigo' => $this->codigo,
             'observacao' => $this->observacao,
             'turma' => $this->turma,
+            'conteudos'  => ConteudoResource::collection($this->whenLoaded('conteudos')),
             'created_at' => $this->created_at->format('Y-m-d\TH:i:s\Z'),
             'updated_at' => $this->updated_at->format('Y-m-d\TH:i:s\Z'),
         ];

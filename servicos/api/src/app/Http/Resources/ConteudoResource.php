@@ -22,6 +22,8 @@ class ConteudoResource extends JsonResource
             'filehash' => $this->filehash,
             'objeto' => $this->caminho,
             'extension'=> $this->extension,
+            'professor' => $this->aula->dono->name ?? 'Professor',
+            'fileUrl' => "http://127.0.0.1:8009/{$this->id}/{$this->caminho}",
             'created_at' => $this->created_at->format('Y-m-d\TH:i:s\Z'),
             'updated_at' => $this->updated_at->format('Y-m-d\TH:i:s\Z'),
         ];

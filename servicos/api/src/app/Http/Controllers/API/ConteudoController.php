@@ -25,10 +25,12 @@ class ConteudoController extends BaseController
     {
         $input = $request->except('ar_file');
 
-        $validator = Validator::make($input, [
+        $validator = Validator::make($request->all(), [
             'nome' => 'required',
             'descricao' => 'required',
-            'escala' => 'required'
+            'escala' => 'required',
+            'aula_id' => 'required|exists:aulas,id',
+            'ar_file' => 'required|file'
         ]);
 
         if ($validator->fails()) {
@@ -40,8 +42,22 @@ class ConteudoController extends BaseController
         $conteudo->filehash = hash_file('md5', $request->ar_file);
         $conteudo->size = $request->ar_file->getSize();
         $conteudo->extension = $request->ar_file->getClientOriginalExtension();
-        $conteudo->path = $conteudo->filehash . '.' . $conteudo->extension;
-        $request->ar_file->storeAs($this->upload_folder . '/' . $conteudo->id, $conteudo->filehash . '.' . $conteudo->extension);
+        $conteudo->caminho = $conteudo->filehash . '.' . $conteudo->extension;
+
+        $folderPath = 'public/' . $this->upload_folder . '/' . $conteudo->id;
+        $fullDirectoryPath = storage_path('app/' . $folderPath);
+        $fileName = $conteudo->filehash . '.' . $conteudo->extension;
+
+        if (!File::exists($fullDirectoryPath)) {
+            File::makeDirectory($fullDirectoryPath, 0755, true, true);
+        }
+
+        $request->ar_file->storeAs($folderPath, $fileName);
+
+        chmod($fullDirectoryPath . '/' . $fileName, 0644);
+        
+        chmod($fullDirectoryPath, 0755);
+
         $conteudo->save();
 
         return $this->sendResponse(new ConteudoResource($conteudo), 'cadastro');
@@ -58,43 +74,76 @@ class ConteudoController extends BaseController
         return $this->sendResponse(new ConteudoResource($conteudo), 'conteudo');
     }
 
-    public function update(Request $request, Conteudo $conteudo)
+    public function update(Request $request, $id)
     {
-        $input = $request->except('ar_file');
+        $conteudo = Conteudo::find($id);
 
-        $validator = Validator::make($input, [
-            'name' => 'required',
-            'description' => 'required'
+        if (is_null($conteudo)) {
+            return $this->sendError('Objeto 3D não encontrado');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nome' => 'sometimes|required',
+            'descricao' => 'sometimes|required',
+            'escala' => 'sometimes|required',
+            'ar_file' => 'sometimes|file'
         ]);
 
         if ($validator->fails()) {
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $conteudo->name = $input['name'];
-        $conteudo->description = $input['description'];
+        $conteudo->nome = $request->input('nome') ?? $conteudo->nome;
+        $conteudo->descricao = $request->input('descricao') ?? $conteudo->descricao;
+        $conteudo->escala = $request->input('escala') ?? $conteudo->escala;
 
-        if (isset($request->ar_file) && $request->ar_file->getSize() > 0) {
-            $conteudo->filehash = hash_file('md5', $request->ar_file);
-            $conteudo->size = $request->ar_file->getSize();
-            $conteudo->extension = $request->ar_file->getClientOriginalExtension();
-            $caminho = $request->ar_file->storeAs($this->upload_folder . '/' . $conteudo->id, $conteudo->filehash . '.' . $conteudo->extension);
-            $conteudo->caminho = $caminho;
+        if ($request->hasFile('ar_file')) {
+            $file = $request->file('ar_file');
+            
+            $conteudo->filehash = hash_file('md5', $file);
+            $conteudo->size = $file->getSize();
+            $conteudo->extension = $file->getClientOriginalExtension();
+            $fileName = $conteudo->filehash . '.' . $conteudo->extension;
+            
+            $conteudo->caminho = $fileName;
+
+            $folderPath = 'public/' . $this->upload_folder . '/' . $conteudo->id;
+            $fullDirectoryPath = storage_path('app/' . $folderPath);
+
+            if (!File::exists($fullDirectoryPath)) {
+                File::makeDirectory($fullDirectoryPath, 0755, true, true);
+            }
+
+            $file->storeAs($folderPath, $fileName);
+
+            chmod($fullDirectoryPath, 0755);
+            chmod($fullDirectoryPath . '/' . $fileName, 0644);
         }
 
-        $conteudo->update();
+        $conteudo->save();
 
         return $this->sendResponse(new ConteudoResource($conteudo), 'atualizacao');
     }
 
-    public function destroy(Conteudo $conteudo)
+    public function destroy($id)
     {
+        $conteudo = Conteudo::find($id);
 
-        if (File::deleteDirectory(storage_path('app/' . $this->upload_folder) . '/' . $conteudo->id)) {
-            $conteudo->delete();
+        if (is_null($conteudo)) {
+            return $this->sendError('Objeto 3D não encontrado');
+        }
+
+        $directoryPath = storage_path('app/public/' . $this->upload_folder . '/' . $conteudo->id);
+
+        if (File::exists($directoryPath)) {
+            File::deleteDirectory($directoryPath);
+        }
+
+        if ($conteudo->delete()) {
             return $this->sendResponse([], 'remocao');
-        } else
-            return $this->sendError('Erro de Remoção', 'Não foi possível remover o arquivo', 400);
+        }
+
+        return $this->sendError('Erro de Remoção', 'Não foi possível remover o registro do banco.', 500);
     }
 
     public function download($conteudo)
@@ -151,5 +200,61 @@ class ConteudoController extends BaseController
         $file_path = storage_path($path);
 
         return response()->download($file_path);
+    }
+
+    public function comunidade()
+    {
+        $meuId = auth()->id();
+
+        $conteudos = Conteudo::whereHas('aula.disciplina', function ($query) use ($meuId) {
+            $query->where('dono_id', '!=', $meuId);
+        })
+        ->with(['aula.disciplina.dono'])
+        ->get();
+
+        return $this->sendResponse(ConteudoResource::collection($conteudos), 'conteudos');
+    }
+
+    public function clone(Request $request, $id)
+    {
+        try {
+            $original = Conteudo::findOrFail($id);
+            
+            $novoConteudo = $original->replicate();
+            $novoConteudo->aula_id = $request->aula_id;
+            
+            $novoConteudo->save(); 
+
+            $caminhoOriginal = storage_path('app/public/objetos/' . $original->id);
+            $caminhoNovo = storage_path('app/public/objetos/' . $novoConteudo->id);
+
+            if (File::exists($caminhoOriginal)) {
+                File::makeDirectory($caminhoNovo, 0755, true);
+                
+                $nomeArquivo = $original->filehash . '.' . $original->extension;
+                $arquivoOrigem = $caminhoOriginal . '/' . $nomeArquivo;
+                $arquivoDestino = $caminhoNovo . '/' . $nomeArquivo;
+                
+                if (File::exists($arquivoOrigem)) {
+                    link($arquivoOrigem, $arquivoDestino);
+                    
+                    chmod($caminhoNovo, 0755);
+                    chmod($arquivoDestino, 0644);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Objeto clonado com sucesso!',
+                'data' => [
+                    'id' => $novoConteudo->id,
+                    'nome' => $novoConteudo->nome,
+                    'aula_id' => $novoConteudo->aula_id 
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return $this->sendError('Erro ao clonar: ' . $e->getMessage());
+        }
     }
 }

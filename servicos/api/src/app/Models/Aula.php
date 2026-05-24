@@ -22,7 +22,7 @@ class Aula extends Model
         static::creating(fn (Aula $aula) => $aula->codigo = (string) Uuid::uuid4());
     }
 
-    public function conteudo()
+    public function conteudos()
     {
         return $this->hasMany(Conteudo::class);
     }
@@ -34,6 +34,6 @@ class Aula extends Model
 
     public function dono()
     {
-        return $this->hasOne(Usuario::class, 'id', 'dono_id');
+        return $this->disciplina->dono();
     }
 }

@@ -24,23 +24,31 @@ class AulaController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'codigo' => 'required',
-            'dono' => 'required'
+            'name'          => 'required',
+            'owner_id'      => 'required',
+            'disciplina_id' => 'required|exists:disciplinas,id'
         ]);
 
         if ($validator->fails()) {
             return response(content: $validator->errors(),status: Response::HTTP_BAD_REQUEST);
         }
 
-        $aula = Aula::create($input);
+        $aula = Aula::create([
+            'nome'          => $input['name'],
+            'dono_id'       => $input['owner_id'],
+            'disciplina_id' => $input['disciplina_id'],
+            'observacao'    => $input['description'] ?? null,
+            'turma'         => $input['class_name'] ?? "Geral",
+        ]);
 
         return response()->json($aula, Response::HTTP_CREATED);
     }
 
     public function show($id)
     {
-        $aula = Aula::find($id);
-
+        $aula = Aula::with(['conteudos' => function($query) {
+                    $query->orderBy('id', 'desc');
+                }])->find($id);
         if (is_null($aula)) {
             return response(status: Response::HTTP_NOT_FOUND);
         }
@@ -53,18 +61,21 @@ class AulaController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'code' => 'required',
-            'owner' => 'required'
+            'name'     => 'required',
+            'owner_id' => 'required|exists:users,id'
         ]);
 
         if ($validator->fails()) {
             return response(content: $validator->errors(), status: Response::HTTP_BAD_REQUEST);
         }
 
-        $aula->code = $input['code'];
-        $aula->owner = $input['owner'];
-        $aula->name = $input['name'];
-        $aula->save();
+        $aula->update([
+            'nome'          => $input['name'],
+            'dono_id'       => $input['owner_id'],
+            'observacao'    => $input['description'] ?? $aula->observacao,
+            'turma'         => $input['class_name'] ?? $aula->turma,
+            'disciplina_id' => $input['disciplina_id'] ?? $aula->disciplina_id,
+        ]);
 
         return $this->sendResponse(new AulaResource($aula), 'atualizacao');
     }
