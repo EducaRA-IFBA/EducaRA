@@ -31,7 +31,7 @@ git clone https://github.com/EducaRA-IFBA/EducaRA.git
 cd educara
 ```
 
-### Compilando e Executando a API
+### Compilando e Executando a API - Back-end
 - Abra um terminal de comando e execute o comando a partir do diretório "servicos":
 - Renomeie o arquivo .env.example presente na raiz do projeto para .env
   
@@ -49,7 +49,7 @@ ou utilize o Docker Desktop para iniciar o back-end.
 - Conecte um dispositivo Android ou use um emulador.
 - Clique em "Run" para compilar e executar o aplicativo.
 
-### Executando o Painel Web
+### Executando o Painel Web - Front-end
 Abra um novo terminal a partir da raiz do projeto:
 
 ```bash
