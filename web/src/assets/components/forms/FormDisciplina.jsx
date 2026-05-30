@@ -24,7 +24,6 @@ export function FormDisciplina({ initialData, onSuccess, onCancel }) {
         }
 
         onSuccess(data);
-        console.log(nome)
     }
 
     return (

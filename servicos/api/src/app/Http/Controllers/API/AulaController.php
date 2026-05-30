@@ -72,7 +72,7 @@ class AulaController extends BaseController
         $aula->update([
             'nome'          => $input['name'],
             'dono_id'       => $input['owner_id'],
-            'observacao'    => $input['description'] ?? $aula->observacao,
+            'observacao'    => $input['description'],
             'turma'         => $input['class_name'] ?? $aula->turma,
             'disciplina_id' => $input['disciplina_id'] ?? $aula->disciplina_id,
         ]);

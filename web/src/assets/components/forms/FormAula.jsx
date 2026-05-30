@@ -6,7 +6,7 @@ export function FormAula({ initialData, onSuccess, onCancel }) {
 
     const [ nome, setNome ] = useState(initialData?.name || initialData?.nome || "");
     const [ obs, setObs ] = useState(initialData?.description || initialData?.observacao || "");
-    const [erros, setErros] = useState({
+    const [ erros, setErros ] = useState({
         nome: "",
         obs: ""
     });
@@ -19,23 +19,18 @@ export function FormAula({ initialData, onSuccess, onCancel }) {
 
         const errosDetectados = {
             nome: "",
-            obs: ""
         };
 
         if(!nome.trim()) {
             errosDetectados.nome = mensagemErro;
         }
 
-        if(!obs.trim()) {
-            errosDetectados.obs = mensagemErro;
-        }
-
-        if(errosDetectados.nome || errosDetectados.obs) {
+        if(errosDetectados.nome) {
             setErros(errosDetectados);
             return;
         }
 
-        setErros({ nome: "", obs: "" });
+        setErros({ nome: ""});
 
         const data = {
             id: initialData?.id,
@@ -44,7 +39,6 @@ export function FormAula({ initialData, onSuccess, onCancel }) {
         }
 
         onSuccess(data);
-        console.log(data)
     }
 
     return (
@@ -66,9 +60,7 @@ export function FormAula({ initialData, onSuccess, onCancel }) {
                     value={obs}
                     onChange={(e) => {
                         setObs(e.target.value)
-                        if(erros.obs) setErros(prev => ({ ...prev, obs: "" }));
                     }}
-                    error={erros.obs}
                 />
 
                 <div className="flex justify-center items-center gap-5 mb-6">

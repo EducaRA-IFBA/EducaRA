@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nome');
             $table->uuid('codigo');
-            $table->string('observacao');
+            $table->string('observacao')->nullable();
             $table->string('turma');
             $table->unsignedBigInteger('dono_id'); //dono da sala (professor)
             $table->unsignedBigInteger('disciplina_id');

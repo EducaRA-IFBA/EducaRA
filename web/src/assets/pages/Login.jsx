@@ -60,7 +60,6 @@ function Login() {
                     email: email,
                     senha: senha
                 });
-                console.log(response.data)
                 const { token, nome } = response.data.login;
 
                 localStorage.setItem('@EducaRA:token', token);

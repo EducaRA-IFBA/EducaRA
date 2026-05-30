@@ -16,7 +16,7 @@ export function Card({ title, subtitle, value, colorClass, children, variant = "
         <div 
             style={{ borderLeftColor : colorClass }}
             className={`w-full p-6 rounded-2xl border-l-8 bg-white shadow-sm
-                ${variant === "row" ? "flex flex-col md:flex-row justify-between items-start gap-4 md:gap-10" : "flex flex-col gap-1"}`}
+                ${variant === "row" ? "flex flex-col md:flex-row justify-between md:items-center items-start gap-4 md:gap-10" : "flex flex-col gap-1"}`}
         >
             {variant === "row" ? (
                 <>

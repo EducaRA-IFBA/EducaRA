@@ -55,7 +55,7 @@ function Disciplina() {
         mutationFn: async (novaAula) => {
             const dados = {
                 name: novaAula.name,
-                description: novaAula.description,
+                description: novaAula.description || "",
                 disciplina_id: Number(id),
                 owner_id: 1,
                 class_name: novaAula.turma || ""
