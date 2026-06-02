@@ -8,11 +8,13 @@ function Model({ url }) {
     return <primitive object={scene}/>
 }
 
-export function Viewer3D({ fileUrl }) {
+export function Viewer3D({ objetoUrl }) {
+
+    alert(objetoUrl);
 
     const controlsRef = useRef();
 
-    if(!fileUrl) return null;
+    if(!objetoUrl) return null;
 
     const handleZoomIn = () => {
         if (controlsRef.current) {
@@ -62,7 +64,7 @@ export function Viewer3D({ fileUrl }) {
                         intensity={0.6} 
                         contactShadow={{ opacity: 0.6, blur: 2 
                     }}>
-                        <Model url={fileUrl} />
+                        <Model url={objetoUrl} />
                     </Stage>
                 </Suspense>
 

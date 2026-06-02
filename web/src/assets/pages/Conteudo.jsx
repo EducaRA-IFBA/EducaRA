@@ -9,7 +9,7 @@ import { Viewer3D } from "../components/Viewer3D";
 import { Modal } from "../components/Modal";
 import { FormConteudo } from "../components/forms/FormConteudo";
 import { Loading } from "../components/Loading";
-import api from "../services/api";
+import api, {objetosUrl} from "../services/api";
 import { toast } from "sonner";
 
 const fetchConteudo = async (id) => {
@@ -43,7 +43,7 @@ function Conteudo() {
     });
 
     const {
-        data: conteudoAtual = { nome: "", descricao: "", fileUrl: "" },
+        data: conteudoAtual = { nome: "", descricao: "", caminho: "" },
         isPending: loadingQuery,
         isFetching
     } = useQuery({
@@ -52,7 +52,7 @@ function Conteudo() {
         enabled: !!id,
     });
 
-    const fileUrl = conteudoAtual.fileUrl;
+    const objetoUrl = `${objetosUrl}/${conteudoAtual.caminho}`;
 
     const editarConteudoMutation = useMutation({
         mutationFn: async (dadosAtualizados) => {
@@ -176,7 +176,7 @@ function Conteudo() {
 
     const copiarConteudoMutation = useMutation({
     mutationFn: async () => {
-        await api.post(`/conteudos/${id}/clone`, { aula_id: aulaId });
+        await api.post(`/conteudos/${id}/clonar`, { aula_id: aulaId });
     },
 
     onMutate: async () => {
@@ -290,7 +290,7 @@ function Conteudo() {
             
             queryClient.setQueryData(["conteudo", id], (prev) => ({
                 ...prev,
-                fileUrl: urlLocalProvisoria
+                objetoUrl: urlLocalProvisoria
             }));
 
             editarConteudoMutation.mutate({
@@ -393,8 +393,8 @@ function Conteudo() {
                 </div>
                 
                 <div className="bg-white rounded-b-xl p-4 shadow-sm w-full h-96 md:h-100 overflow-hidden flex flex-col">
-                    {abaAtiva === "preview" && !loadingQuery && fileUrl && renderizar3D && (
-                        <Viewer3D fileUrl={fileUrl} />
+                    {abaAtiva === "preview" && !loadingQuery && objetoUrl && renderizar3D && (
+                        <Viewer3D objetoUrl={objetoUrl} />
                     )}
 
                     {abaAtiva === "upload" && (

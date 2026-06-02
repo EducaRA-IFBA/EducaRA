@@ -4,6 +4,8 @@ const api = axios.create({
     baseURL: 'http://localhost:9000/api/v1/',
 });
 
+export const objetosUrl = 'http://localhost:8009/objetos';
+
 api.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('@EducaRA:token');
@@ -22,3 +24,4 @@ api.interceptors.request.use(
 );
 
 export default api;
+
