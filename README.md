@@ -37,10 +37,9 @@ cd educara
   
 ```bash
 cd servicos
-docker-compose exec api php artisan key:generate
 docker-compose up -d --build
-docker-compose exec api php artisan migrate:fresh --seed
-docker-compose exec api php artisan storage:link
+docker-compose exec -w /var/www/html/ api composer install
+docker-compose exec -w /var/www/html/ api php artisan migrate:fresh --seed
 ```
 
 ou utilize o Docker Desktop para iniciar o back-end.
