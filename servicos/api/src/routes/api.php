@@ -18,7 +18,7 @@ Route::middleware('api')->prefix('v1')->group(function () {
     Route::post('/login', [UsuarioController::class, 'login']);
     Route::post('/register', [UsuarioController::class, 'register']);
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('read.bypass')->group(function () {
         Route::get('/conteudos/comunidade', [ConteudoController::class, 'getConteudosComunidade']);
         Route::post('/conteudos/{id}/clonar', [ConteudoController::class, 'clonar']);
 
@@ -28,7 +28,7 @@ Route::middleware('api')->prefix('v1')->group(function () {
             'aulas'       => AulaController::class,
         ]);
 
-        Route::get('/aulas/disciplina/{disciplina_id}', [AulaController::class, 'getAulas'])->name('v1.disciplinas.aulas.show');
+        Route::get('/aulas/disciplina/{disciplina_id}', [AulaController::class, 'getAulas'])->name('v1.aulas.show');
         Route::get('/conteudos/aula/{aula_id}', [ConteudoController::class, 'getConteudos'])->name('v1.conteudos.show');
         Route::get('/conteudos/{codigo}/download', [ConteudoController::class, 'downloadConteudo'])->name('v1.conteudos.download');
 

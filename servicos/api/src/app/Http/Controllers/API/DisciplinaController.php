@@ -13,10 +13,17 @@ class DisciplinaController extends BaseController
 {
     public function index()
     {
-        $disciplinas = Disciplina::where('dono_id', auth()->id())
-            ->withCount(['aulas', 'conteudos'])
-            ->orderBy('nome', 'asc')
-            ->get();
+        $userId = auth()->id();
+        if ($userId) {
+            $disciplinas = Disciplina::where('dono_id', $userId)
+                ->withCount(['aulas', 'conteudos'])
+                ->orderBy('nome', 'asc')
+                ->get();
+        } else {
+            $disciplinas = Disciplina::withCount(['aulas', 'conteudos'])
+                ->orderBy('nome', 'asc')
+                ->get();
+        }
 
         return $this->sendResponse(DisciplinaResource::collection($disciplinas), 'disciplinas');
     }
@@ -101,4 +108,6 @@ class DisciplinaController extends BaseController
 
         return $this->sendResponse([], 'remocao');
     }
+
+
 }

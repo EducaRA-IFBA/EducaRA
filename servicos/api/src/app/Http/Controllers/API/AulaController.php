@@ -37,7 +37,7 @@ class AulaController extends BaseController
             'nome'          => $input['name'],
             'dono_id'       => $input['owner_id'],
             'disciplina_id' => $input['disciplina_id'],
-            'observacao'    => $input['description'] ?? null,
+            'observacao'    => $input['description'] ?? "",
             'turma'         => $input['class_name'] ?? "Geral",
         ]);
 
