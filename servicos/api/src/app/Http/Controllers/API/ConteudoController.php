@@ -39,26 +39,32 @@ class ConteudoController extends BaseController
 
         $conteudo = Conteudo::create($input);
 
-        $conteudo->filehash = hash_file('md5', $request->ar_file);
+        $conteudo->filehash = hash_file('md5', $request->ar_file->getRealPath());
         $conteudo->size = $request->ar_file->getSize();
         $conteudo->extension = $request->ar_file->getClientOriginalExtension();
         $conteudo->caminho = $conteudo->filehash . '.' . $conteudo->extension;
 
-        $folderPath = 'public/' . $this->upload_folder . '/' . $conteudo->id;
-        $fullDirectoryPath = storage_path('app/' . $folderPath);
+        $fullDirectoryPath = storage_path($this->upload_folder . '/' . $conteudo->id);
         $fileName = $conteudo->filehash . '.' . $conteudo->extension;
 
-        if (!File::exists($fullDirectoryPath)) {
-            File::makeDirectory($fullDirectoryPath, 0755, true, true);
+        error_log('Caminho completo para upload: ' . $fullDirectoryPath);
+        error_log('Nome do arquivo: ' . $fileName);
+
+        try {
+            if (!File::exists($fullDirectoryPath)) {
+                File::makeDirectory($fullDirectoryPath, 0755, true, true);
+            }
+
+            $request->ar_file->move($fullDirectoryPath, $fileName);
+            chmod($fullDirectoryPath . '/' . $fileName, 0644);
+            chmod($fullDirectoryPath, 0755);
+
+            $conteudo->save();
+        } catch (\Exception $e) {
+            error_log('Erro gravando modelo 3d do conteúdo: ' . $e->getMessage());
+
+            return $this->sendError('Erro ao salvar o arquivo do conteúdo.');
         }
-
-        $request->ar_file->storeAs($folderPath, $fileName);
-
-        chmod($fullDirectoryPath . '/' . $fileName, 0644);
-        
-        chmod($fullDirectoryPath, 0755);
-
-        $conteudo->save();
 
         return $this->sendResponse(new ConteudoResource($conteudo), 'cadastro');
     }
@@ -103,21 +109,29 @@ class ConteudoController extends BaseController
             $conteudo->filehash = hash_file('md5', $file);
             $conteudo->size = $file->getSize();
             $conteudo->extension = $file->getClientOriginalExtension();
+
             $fileName = $conteudo->filehash . '.' . $conteudo->extension;
-            
             $conteudo->caminho = $fileName;
 
-            $folderPath = 'public/' . $this->upload_folder . '/' . $conteudo->id;
-            $fullDirectoryPath = storage_path('app/' . $folderPath);
+            $fullDirectoryPath = storage_path($this->upload_folder . '/' . $conteudo->id);
+            $fileName = $conteudo->filehash . '.' . $conteudo->extension;
 
-            if (!File::exists($fullDirectoryPath)) {
-                File::makeDirectory($fullDirectoryPath, 0755, true, true);
+            error_log('Caminho completo para upload: ' . $fullDirectoryPath);
+            error_log('Nome do arquivo: ' . $fileName);
+
+            try {
+                if (!File::exists($fullDirectoryPath)) {
+                    File::makeDirectory($fullDirectoryPath, 0755, true, true);
+                }
+
+                $request->ar_file->move($fullDirectoryPath, $fileName);
+                chmod($fullDirectoryPath . '/' . $fileName, 0644);
+                chmod($fullDirectoryPath, 0755);
+            } catch (\Exception $e) {
+                error_log('Erro gravando modelo 3d do conteúdo: ' . $e->getMessage());
+
+                return $this->sendError('Erro ao salvar o arquivo do conteúdo.');
             }
-
-            $file->storeAs($folderPath, $fileName);
-
-            chmod($fullDirectoryPath, 0755);
-            chmod($fullDirectoryPath . '/' . $fileName, 0644);
         }
 
         $conteudo->save();
@@ -133,7 +147,7 @@ class ConteudoController extends BaseController
             return $this->sendError('Objeto 3D não encontrado');
         }
 
-        $directoryPath = storage_path('app/public/' . $this->upload_folder . '/' . $conteudo->id);
+        $directoryPath = storage_path($this->upload_folder . '/' . $conteudo->id);
 
         if (File::exists($directoryPath)) {
             File::deleteDirectory($directoryPath);
@@ -148,9 +162,9 @@ class ConteudoController extends BaseController
 
     public function download($conteudo)
     {
-        $path = 'app/' . $this->upload_folder . $conteudo->id . '/' . $conteudo->filehash . '.' . $conteudo->extension;
-        $file_path = storage_path($path);
-
+        $directoryPath = storage_path($this->upload_folder . '/' . $conteudo->id);
+        $file_path = $directoryPath . '/' . $conteudo->filehash . '.' . $conteudo->extension;
+        
         return response()->download($file_path);
     }
 
@@ -196,13 +210,13 @@ class ConteudoController extends BaseController
             return $this->sendError('Objeto 3D não encontrado');
         }
 
-        $path = 'app/' . $this->upload_folder . $conteudo->id . '/' . $conteudo->filehash . '.' . $conteudo->extension;
-        $file_path = storage_path($path);
+        $directoryPath = storage_path($this->upload_folder . '/' . $conteudo->id);
+        $file_path = $directoryPath . '/' . $conteudo->filehash . '.' . $conteudo->extension;
 
         return response()->download($file_path);
     }
 
-    public function comunidade()
+    public function getConteudosComunidade()
     {
         $meuId = auth()->id();
 
@@ -215,7 +229,7 @@ class ConteudoController extends BaseController
         return $this->sendResponse(ConteudoResource::collection($conteudos), 'conteudos');
     }
 
-    public function clone(Request $request, $id)
+    public function clonar(Request $request, $id)
     {
         try {
             $original = Conteudo::findOrFail($id);
@@ -225,8 +239,8 @@ class ConteudoController extends BaseController
             
             $novoConteudo->save(); 
 
-            $caminhoOriginal = storage_path('app/public/objetos/' . $original->id);
-            $caminhoNovo = storage_path('app/public/objetos/' . $novoConteudo->id);
+            $caminhoOriginal = storage_path($this->upload_folder . '/' . $original->id);
+            $caminhoNovo = storage_path($this->upload_folder . '/' . $novoConteudo->id);
 
             if (File::exists($caminhoOriginal)) {
                 File::makeDirectory($caminhoNovo, 0755, true);

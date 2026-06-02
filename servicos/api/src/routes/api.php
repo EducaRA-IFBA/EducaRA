@@ -19,8 +19,8 @@ Route::middleware('api')->prefix('v1')->group(function () {
     Route::post('/register', [UsuarioController::class, 'register']);
 
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/conteudos/comunidade', [ConteudoController::class, 'comunidade']);
-        Route::post('/conteudos/{id}/clone', [ConteudoController::class, 'clone']);
+        Route::get('/conteudos/comunidade', [ConteudoController::class, 'getConteudosComunidade']);
+        Route::post('/conteudos/{id}/clonar', [ConteudoController::class, 'clonar']);
 
         Route::apiResources([
             'disciplinas' => DisciplinaController::class,
