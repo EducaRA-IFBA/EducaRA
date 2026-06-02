@@ -110,6 +110,9 @@ class ConteudoController extends BaseController
             $conteudo->size = $file->getSize();
             $conteudo->extension = $file->getClientOriginalExtension();
 
+            $fullOldDirectoryPath = storage_path($this->upload_folder . '/' . $conteudo->id .'/' . $conteudo->caminho);
+            error_log('Caminho completo do arquivo anterior: ' . $fullOldDirectoryPath);
+
             $fileName = $conteudo->filehash . '.' . $conteudo->extension;
             $conteudo->caminho = $fileName;
 
@@ -120,6 +123,10 @@ class ConteudoController extends BaseController
             error_log('Nome do arquivo: ' . $fileName);
 
             try {
+                if (File::exists($fullOldDirectoryPath)) {
+                    File::delete($fullOldDirectoryPath);
+                }
+
                 if (!File::exists($fullDirectoryPath)) {
                     File::makeDirectory($fullDirectoryPath, 0755, true, true);
                 }
