@@ -9,9 +9,6 @@ function Model({ url }) {
 }
 
 export function Viewer3D({ objetoUrl }) {
-
-    alert(objetoUrl);
-
     const controlsRef = useRef();
 
     if(!objetoUrl) return null;
