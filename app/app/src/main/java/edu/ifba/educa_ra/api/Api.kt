@@ -14,18 +14,19 @@ import java.net.URL
 import java.util.zip.ZipFile
 import kotlin.reflect.KFunction1
 
+const val IP_SERVICOS = "10.0.2.2"
 const val PORTA_SERVICOS = "9000"
-const val URL_SERVICOS = "http://10.0.2.2:$PORTA_SERVICOS/api/v1"
-//const val URL_SERVICOS = "http://10.249.205.215:$PORTA_SERVICOS/api/v1"
+const val URL_SERVICOS = "http://$IP_SERVICOS:$PORTA_SERVICOS/api/v1"
 
 const val URL_ALIVE = "$URL_SERVICOS/alive"
 const val URL_DISCIPLINAS = "$URL_SERVICOS/disciplinas"
-const val URL_AULAS = "$URL_SERVICOS/aulas"
-const val URL_CONTEUDOS = "$URL_SERVICOS/conteudos"
+const val URL_AULAS = "$URL_SERVICOS/aulas/disciplina"
+const val URL_CONTEUDOS = "$URL_SERVICOS/conteudos/aula"
+
+const val TOKEN_FIXO = "f4c9d20d8bb64156a9ce2e1b2ff0c4a7a0d1fa6b7e3c4f8a9b0c1d2e3f4a5b6c"
 
 const val PORTA_OBJETOS = "8009"
-const val URL_OBJETOS = "http://10.0.2.2:$PORTA_OBJETOS"
-//const val URL_OBJETOS = "http://10.249.205.215:$PORTA_OBJETOS"
+const val URL_OBJETOS = "http://$IP_SERVICOS:$PORTA_OBJETOS"
 
 const val TIMEOUT = 4000
 
@@ -39,6 +40,10 @@ fun toJson(stream: InputStream): String {
     }
 
     return json.toString()
+}
+
+fun setReadOnlyToken(conn: HttpURLConnection) {
+    conn.setRequestProperty("Authorization", "Bearer $TOKEN_FIXO")
 }
 
 fun isAlive(): Boolean {
@@ -112,6 +117,7 @@ class GetDisciplinas(private val onDisciplinas: KFunction1<List<DisciplinaModelo
             if (isAlive()) {
                 val url = URL(URL_DISCIPLINAS)
                 val conn = url.openConnection() as HttpURLConnection
+                setReadOnlyToken(conn);
                 conn.connectTimeout = TIMEOUT
                 conn.readTimeout = TIMEOUT
 
@@ -145,10 +151,11 @@ class GetAulas(private val idDisciplina: String, private val onAulas: KFunction1
 
             aulas.add(
                 AulaModelo(
-                objeto.getString("id"),
-                objeto.getString("nome"),
-                objeto.getString("observacao"),
-                idDisciplina)
+                    objeto.getString("id"),
+                    objeto.getString("nome"),
+                    objeto.getString("observacao"),
+                    idDisciplina
+                )
             )
         }
 
@@ -162,6 +169,7 @@ class GetAulas(private val idDisciplina: String, private val onAulas: KFunction1
             if (isAlive()) {
                 val url = URL("$URL_AULAS/$idDisciplina")
                 val conn = url.openConnection() as HttpURLConnection
+                setReadOnlyToken(conn)
                 conn.connectTimeout = TIMEOUT
                 conn.readTimeout = TIMEOUT
 
@@ -215,6 +223,7 @@ class GetConteudos(private val idAula: String, private val onConteudos: KFunctio
             if (isAlive()) {
                 val url = URL("$URL_CONTEUDOS/$idAula")
                 val conn = url.openConnection() as HttpURLConnection
+                setReadOnlyToken(conn)
                 conn.connectTimeout = TIMEOUT
                 conn.readTimeout = TIMEOUT
 
