@@ -51,7 +51,6 @@ services:
       - '9000:80'
     volumes:
       - ./api/src:/var/www/html
-      - ./api/src/storage/logs:/var/www/html/storage/logs
       - ./static/html/objetos:/var/www/html/storage/objetos
     working_dir: /var/www/html
     depends_on:
