@@ -14,7 +14,8 @@ import java.net.URL
 import java.util.zip.ZipFile
 import kotlin.reflect.KFunction1
 
-const val IP_SERVICOS = "10.0.2.2"
+//const val IP_SERVICOS = "10.0.2.2"
+const val IP_SERVICOS = "192.168.0.105"
 const val PORTA_SERVICOS = "9000"
 const val URL_SERVICOS = "http://$IP_SERVICOS:$PORTA_SERVICOS/api/v1"
 
@@ -26,7 +27,7 @@ const val URL_CONTEUDOS = "$URL_SERVICOS/conteudos/aula"
 const val TOKEN_FIXO = "f4c9d20d8bb64156a9ce2e1b2ff0c4a7a0d1fa6b7e3c4f8a9b0c1d2e3f4a5b6c"
 
 const val PORTA_OBJETOS = "8009"
-const val URL_OBJETOS = "http://$IP_SERVICOS:$PORTA_OBJETOS"
+const val URL_OBJETOS = "http://$IP_SERVICOS:$PORTA_OBJETOS/objetos"
 
 const val TIMEOUT = 4000
 
@@ -200,14 +201,16 @@ class GetConteudos(private val idAula: String, private val onConteudos: KFunctio
 
         for (i in 0 until objetos.length()) {
             val objeto = objetos.get(i) as JSONObject
-            val zip = objeto.getString("objeto")
+
+            val id = objeto.getString("id")
+            val modelo = objeto.getString("objeto")
 
             conteudos.add(
                 ConteudoModelo(
-                    objeto.getString("id"),
+                    id,
                     objeto.getString("nome"),
                     objeto.getString("descricao"),
-                    "$URL_OBJETOS/$zip",
+                    "$URL_OBJETOS/$id/$modelo",
                     idAula
                 )
             )
@@ -257,8 +260,8 @@ class GetObjeto(private val conteudo: ConteudoModelo,
         onProgresso(0)
 
         try {
-            val zip = getZip()
-            caminho = unzip(zip)
+            val objeto = getObjeto()
+            caminho = objeto.absolutePath
         } catch (e: Exception) {
             Log.e("GetObjeto()", e.toString())
         }
@@ -266,7 +269,7 @@ class GetObjeto(private val conteudo: ConteudoModelo,
         return caminho
     }
 
-    private fun getZip(): File {
+    private fun getObjeto(): File {
         val url = URL(conteudo.objeto)
         val conn: HttpURLConnection = url.openConnection() as HttpURLConnection
         conn.setRequestProperty("content-type", "binary/data");
@@ -274,63 +277,24 @@ class GetObjeto(private val conteudo: ConteudoModelo,
         val httpStream = conn.inputStream
         onProgresso(1)
 
-        val zip = File("${diretorioApp.absolutePath}/objeto.${conteudo.id}.zip")
-        if (zip.exists()) {
-            zip.delete()
+        val objeto = File("${diretorioApp.absolutePath}/objeto.${conteudo.id}.glb")
+        if (objeto.exists()) {
+            objeto.delete()
         }
-        val zipStream = FileOutputStream(zip)
+        val objStream = FileOutputStream(objeto)
         onProgresso(2)
 
         var bytesLidos = -1;
         val buffer = ByteArray(4096)
         while ((httpStream.read(buffer).also { bytesLidos = it }) != -1) {
-            zipStream.write(buffer, 0, bytesLidos)
+            objStream.write(buffer, 0, bytesLidos)
         }
         onProgresso(3)
 
         httpStream.close();
-        zipStream.close();
+        objStream.close();
 
-        return zip
-    }
-
-    private fun unzip(zip: File): String {
-        val destino = "${diretorioApp.absolutePath}/objeto.${conteudo.id}"
-
-        val dir = File(destino)
-        if (dir.exists()) {
-           dir.deleteRecursively()
-        }
-        dir.mkdir()
-        onProgresso(4)
-
-        ZipFile(zip.absolutePath).use { zip ->
-            zip.entries().asSequence().forEach { entry ->
-                zip.getInputStream(entry).use { input ->
-                    val arquivo = "$destino/${entry.name}"
-
-                    if (!entry.isDirectory) {
-                        extrairArquivo(input, arquivo)
-                    } else {
-                        val dir = File(arquivo)
-                        dir.mkdir()
-                    }
-                }
-            }
-        }
-        onProgresso(5)
-
-        return destino
-    }
-
-    private fun extrairArquivo(inputStream: InputStream, destFilePath: String) {
-        val bos = BufferedOutputStream(FileOutputStream(destFilePath))
-        val bytesIn = ByteArray(1024)
-        var read: Int
-        while (inputStream.read(bytesIn).also { read = it } != -1) {
-            bos.write(bytesIn, 0, read)
-        }
-        bos.close()
+        return objeto
     }
 
     override fun onPostExecute(caminho: String) {

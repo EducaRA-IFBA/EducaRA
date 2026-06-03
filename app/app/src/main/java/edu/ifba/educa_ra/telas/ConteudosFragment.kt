@@ -105,11 +105,11 @@ class ConteudosAdapter() :
             confirmar(this.contexto,
                 "Esta opção irá apagar os arquivos deste conteúdo definitivamente. Confirma?",
                 {
-                    val destino = "${contexto.filesDir.absolutePath}/objeto.${conteudo.id}"
+                    val destino = "${contexto.filesDir.absolutePath}/objeto.${conteudo.id}.glb"
 
-                    val dir = File(destino)
-                    if (dir.exists()) {
-                        dir.deleteRecursively()
+                    val arquivo = File(destino)
+                    if (arquivo.exists()) {
+                        arquivo.delete()
                     }
 
                     notifyDataSetChanged()
@@ -135,13 +135,13 @@ class ConteudosAdapter() :
     }
 
     private fun caminhoConteudo(conteudo: ConteudoModelo): String {
-        return "${contexto.filesDir.absolutePath}/objeto.${conteudo.id}"
+        return "${contexto.filesDir.absolutePath}/objeto.${conteudo.id}.glb"
     }
 
     private fun conteudoDisponivel(caminho: String): Boolean {
-        val arquivos = File(caminho)
+        val arquivo = File(caminho)
 
-        return arquivos.isDirectory && arquivos.exists()
+        return arquivo.isFile && arquivo.exists()
     }
 
     private fun conteudoDisponivel(conteudo: ConteudoModelo): Boolean {
@@ -201,7 +201,7 @@ class ConteudosAdapter() :
         val visualizador = Intent(activity, Visualizador3DActivity::class.java)
 
         visualizador.putExtra("object", DataHolder.objetoSelecionado.nome)
-        visualizador.putExtra("model", "${DataHolder.objetoSelecionado.caminho}/modelo.glb")
+        visualizador.putExtra("model", DataHolder.objetoSelecionado.caminho)
 
         activity.startActivity(visualizador)
     }

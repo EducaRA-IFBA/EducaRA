@@ -11,7 +11,7 @@ import edu.ifba.educa_ra.dados.modelo.AulaModelo
 import edu.ifba.educa_ra.dados.modelo.ConteudoModelo
 import edu.ifba.educa_ra.dados.modelo.DisciplinaModelo
 
-@Database(entities = [AulaModelo::class, ConteudoModelo::class, DisciplinaModelo::class], version = 1, exportSchema = true)
+@Database(entities = [AulaModelo::class, ConteudoModelo::class, DisciplinaModelo::class], version = 2, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun aulaDao(): AulaDao
     abstract fun conteudoDao(): ConteudoDao
@@ -20,10 +20,11 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         fun instancia(context: Context) : AppDatabase {
             return Room.databaseBuilder(
-                context,
-                AppDatabase::class.java,
-                "educara.db"
-            ).allowMainThreadQueries()
+                        context,
+                        AppDatabase::class.java,
+                        "educara.db"
+                    ).fallbackToDestructiveMigration(true)
+                .allowMainThreadQueries()
                 .build()
         }
     }
