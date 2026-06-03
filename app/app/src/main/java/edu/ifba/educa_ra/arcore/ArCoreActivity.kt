@@ -3,13 +3,9 @@
 package edu.ifba.educa_ra.arcore
 
 import android.animation.ValueAnimator
-import android.content.DialogInterface
 import android.net.Uri
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.View
-import android.widget.ImageButton
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -40,6 +36,8 @@ class VisualizadorARCoreActivity() : AppCompatActivity(), FragmentOnAttachListen
     private var modelo: Renderable? = null
     private var rotationAnimator: ValueAnimator? = null
     private var isInteracting = false
+
+    private val ESCALA_PADRAO = 0.25f  // 80% = redução de 20%
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +72,7 @@ class VisualizadorARCoreActivity() : AppCompatActivity(), FragmentOnAttachListen
     }
 
     private fun carregarModelo() {
-        val disponivel = glbDisponivel("${DataHolder.objetoSelecionado.caminho}/modelo.glb")
+        val disponivel = glbDisponivel(DataHolder.objetoSelecionado.caminho)
 
         if (!disponivel) {
             exibirErroCarregamento()
@@ -83,7 +81,7 @@ class VisualizadorARCoreActivity() : AppCompatActivity(), FragmentOnAttachListen
             ModelRenderable.builder()
                 .setSource(
                     this,
-                    Uri.parse("file://${DataHolder.objetoSelecionado.caminho}/modelo.glb")
+                    Uri.parse("file://${DataHolder.objetoSelecionado.caminho}")
                 )
                 .setIsFilamentGltf(true)
                 .setAsyncLoadEnabled(true)
@@ -113,7 +111,7 @@ class VisualizadorARCoreActivity() : AppCompatActivity(), FragmentOnAttachListen
 
         val anchor: Anchor = hitResult!!.createAnchor()
         val anchorNode = AnchorNode(anchor)
-        anchorNode.localScale = Vector3(0.1f, 0.1f, 0.1f)
+        anchorNode.localScale = Vector3(0.1f * ESCALA_PADRAO, 0.1f * ESCALA_PADRAO, 0.1f * ESCALA_PADRAO)
         anchorNode.parent = areaVisualizacao.arSceneView.scene
 
         val model = TransformableNode(areaVisualizacao.transformationSystem)
