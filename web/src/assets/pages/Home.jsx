@@ -99,7 +99,7 @@ function Home() {
         setModalConfig({
             isOpen: true,
             title: "Cadastrar Nova Disciplina",
-            subtitle: "Crie uma nova disciplina para organizar suas aulas:",
+            subtitle: "Crie uma nova disciplina para organizar suas aulas",
             content: <FormDisciplina 
                         onSuccess={(data) => {
                             adicionarDisciplinaMutation.mutate(data);

@@ -202,7 +202,7 @@ function Disciplina() {
         setModalConfig({
             isOpen: true,
             title: "Cadastrar Nova Aula",
-            subtitle: "Crie uma nova aula para organizar seus conteúdos:",
+            subtitle: "Crie uma nova aula para organizar seus conteúdos",
             content: <FormAula
                         disciplinaId={id}
                         onSuccess={(data) => adicionarAulaMutation.mutate(data)}

@@ -34,7 +34,7 @@ export function Viewer3D({ objetoUrl }) {
     };
 
     return(
-        <div className="w-full h-full bg-white rounded-xl overflow-hidden relative border border-gray-200 shadow-inner">
+        <div className="w-full h-137.5 bg-white rounded-xl overflow-hidden relative border border-gray-200 shadow-inner">
 
             <ToolbarViewer 
                 onZoomIn={handleZoomIn}
@@ -43,8 +43,8 @@ export function Viewer3D({ objetoUrl }) {
 
             <Canvas 
                 shadows 
-                camera={{ position: [0, 0, 5.5], fov: 50 }}
-                style={{ height: "100%", width: "100%", flex: 1 }}
+                camera={{ position: [0, 0, 2], fov: 50 }}
+                style={{ height: "100%", width: "100%" }}
             >
                 <color attach="background" args={["#fff"]} />
                 <ambientLight intensity={0.8} />
@@ -59,6 +59,7 @@ export function Viewer3D({ objetoUrl }) {
                     <Stage 
                         environment="city" 
                         intensity={0.6} 
+                        adjustCamera
                         contactShadow={{ opacity: 0.6, blur: 2 
                     }}>
                         <Model url={objetoUrl} />
@@ -68,7 +69,7 @@ export function Viewer3D({ objetoUrl }) {
                 <OrbitControls 
                     ref={controlsRef} 
                     makeDefault 
-                    minDistance={1}
+                    minDistance={0.5}
                     maxDistance={10}
                 />
             </Canvas>

@@ -230,7 +230,7 @@ function Aula() {
         setModalConfig({
             isOpen: true,
             title: "Cadastrar Novo Conteúdo",
-            subtitle: "Crie um novo conteúdo e adicione seu objeto 3D:",
+            subtitle: "Crie um novo conteúdo e adicione seu objeto 3D",
             content: <FormConteudo
                         aulaId={id}
                         onSuccess={(data) => adicionarConteudoMutation.mutate(data)}

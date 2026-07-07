@@ -392,7 +392,7 @@ function Conteudo() {
                     </div>
                 </div>
                 
-                <div className="bg-white rounded-b-xl p-4 shadow-sm w-full h-96 md:h-100 overflow-hidden flex flex-col">
+                <div className="bg-white rounded-b-xl p-4 shadow-sm w-full min-h-112.5 flex-1 flex flex-col">
                     {abaAtiva === "preview" && !loadingQuery && objetoUrl && renderizar3D && (
                         <Viewer3D objetoUrl={objetoUrl} />
                     )}

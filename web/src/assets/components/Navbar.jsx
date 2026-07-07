@@ -43,6 +43,7 @@ export function Navbar() {
     <nav className="w-full py-4 px-4 md:px-8 flex items-center justify-between shadow-sm sticky top-0 bg-white z-50">
       <Link
         to="/home"
+        aria-label="Ir para a página inicial"
         className="flex items-center shrink-0"
       >
         <img 

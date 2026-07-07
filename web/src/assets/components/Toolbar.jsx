@@ -26,6 +26,8 @@ export function Toolbar({ onOpenModal, searchPlaceholder, buttonLabel, onSearchC
                     <div className="relative border-l border-gray-300 ml-2 pl-2">
                         <button 
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            aria-label="Filtrar conteúdos"
+                            aria-expanded={isMenuOpen}
                             className="flex items-center gap-1 text-gray-500 hover:text-[#389137] transition-colors cursor-pointer"
                         >
                             <Filter size={20} />

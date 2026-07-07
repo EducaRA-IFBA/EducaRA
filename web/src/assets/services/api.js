@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:9000/api/v1/',
+    baseURL: import.meta.env.VITE_API_URL,
 });
 
-export const objetosUrl = 'http://localhost:8009/objetos';
+export const objetosUrl = import.meta.env.VITE_OBJETOS_URL;
 
 api.interceptors.request.use(
     (config) => {
