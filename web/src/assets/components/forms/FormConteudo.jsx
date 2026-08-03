@@ -76,6 +76,7 @@ export function FormConteudo({ initialData, onSuccess, onCancel, variant = 'crea
                         if (erros.nome) setErros(prev => ({ ...prev, nome: "" }));
                     }}
                     error={erros.nome}
+                    maxLength={100}
                 />
 
                 <Input
@@ -87,6 +88,9 @@ export function FormConteudo({ initialData, onSuccess, onCancel, variant = 'crea
                         if (erros.descricao) setErros(prev => ({ ...prev, descricao: "" }));
                     }}
                     error={erros.descricao}
+                    multiline
+                    rows={5}
+                    maxLength={255}
                 />
 
                 {!isEditing && (

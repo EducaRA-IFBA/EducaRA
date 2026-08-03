@@ -37,7 +37,7 @@ function Home() {
     });
 
     const colunasHome = [
-        { header: "Nome", accessor: "nome", width: "40%" },
+        { header: "Nome", accessor: "nome", width: "40%", truncate: true },
         { header: "Aulas", accessor: "aulas_count", width: "20%", align: "center" },
         { header: "Conteúdos", accessor: "conteudos_count", width: "20%", align: "center" },
     ];
@@ -167,7 +167,7 @@ function Home() {
                             className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-3 active:bg-gray-50 transition-colors cursor-pointer"
                         >
                             <div className="flex justify-between items-start">
-                                <span className="font-bold text-lg text-gray-800">{item.nome}</span>
+                                <span className="font-bold text-lg text-gray-800 block w-full truncate">{item.nome}</span>
                             </div>
                             
                             <div className="flex gap-6 text-sm text-gray-500 font-semibold pt-3 border-t border-gray-100">

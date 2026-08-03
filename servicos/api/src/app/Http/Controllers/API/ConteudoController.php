@@ -71,7 +71,7 @@ class ConteudoController extends BaseController
 
     public function show($id)
     {
-        $conteudo = Conteudo::find($id);
+        $conteudo = Conteudo::with('aula.disciplina')->find($id);
 
         if (is_null($conteudo)) {
             return $this->sendError('Objeto 3D não encontrado');

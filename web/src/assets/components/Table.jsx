@@ -4,7 +4,7 @@ export function Table({ columns, data = [], actionLabel, onAction }) {
 
     return (
         <div className="w-full bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-300">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse table-fixed">
                 <thead className="bg-[#EEEEEE]">
                     <tr>
                         {columns.map((col, index) => (
@@ -43,8 +43,18 @@ export function Table({ columns, data = [], actionLabel, onAction }) {
                                     className={`px-5 py-2.5 ${
                                     col.align === 'center' ? 'text-center' : ''
                                     }`}
+                                    style={{ width: col.width || "auto" }}
                                 >
-                                    {item[col.accessor]}
+                                    {col.truncate ? (
+                                        <span
+                                            className="block truncate"
+                                            title={item[col.accessor] ?? ""}
+                                        >
+                                            {item[col.accessor] ?? "-"}
+                                        </span>
+                                    ) : (
+                                        item[col.accessor] ?? "-"
+                                    )}
                                 </td>
                             ))}
 

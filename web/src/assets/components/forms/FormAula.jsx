@@ -53,6 +53,7 @@ export function FormAula({ initialData, onSuccess, onCancel }) {
                         if(erros.nome) setErros(prev => ({ ...prev, nome: "" }));
                     }}
                     error={erros.nome}
+                    maxLength={100}
                 />
                 <Input 
                     label="Observações"
@@ -61,6 +62,9 @@ export function FormAula({ initialData, onSuccess, onCancel }) {
                     onChange={(e) => {
                         setObs(e.target.value)
                     }}
+                    multiline
+                    rows={5}
+                    maxLength={255}
                 />
 
                 <div className="flex justify-center items-center gap-5 mb-6">

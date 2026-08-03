@@ -38,6 +38,7 @@ export function FormDisciplina({ initialData, onSuccess, onCancel }) {
                         if(erroNome) setErroNome("")
                     }}
                     error={erroNome}
+                    maxLength={100}
                 />
 
                 <div className="flex items-center justify-center gap-5 mb-6">

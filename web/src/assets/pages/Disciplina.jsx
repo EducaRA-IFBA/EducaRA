@@ -35,8 +35,9 @@ function Disciplina() {
     });
 
     const colunasHome = [
-        { header: "Nome", accessor: "nome", width: "40%" },
-        { header: "Observações", accessor: "observacao", width: "60%", align: "left" },
+        { header: "Nome", accessor: "nome", width: "40%", truncate: true },
+        { header: "Observações", accessor: "observacao", width: "40%", align: "left", truncate: true },
+        { header: "Conteúdos", accessor: "conteudos_count", width: "20%", align: "center" },
     ];
 
     const { 
@@ -382,6 +383,14 @@ function Disciplina() {
                             <p className="text-sm text-gray-500 font-medium wrap-break-word mt-1 line-clamp-2">
                                 <span className="text-gray-700 font-semibold">Obs:</span> {item.observacao}
                             </p>
+                            <div className="flex gap-6 text-sm text-gray-500 font-semibold pt-3 border-t border-gray-100">
+                                <div>
+                                    Conteúdos:
+                                    <span className="text-gray-900 font-bold ml-1">
+                                        {item.conteudos_count}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>

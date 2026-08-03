@@ -347,13 +347,18 @@ function Conteudo() {
                     }
                 />
 
+                <div className="flex items-center gap-2 text-sm text-[#5E8B5E] font-semibold [overflow-wrap:anywhere]">
+                    <span>{conteudoAtual?.disciplina?.nome}</span>
+                    <span>›</span>
+                    <span>{conteudoAtual?.aula?.nome}</span>
+                </div>
                 <div className="w-full mt-2">
                     <ContentCard 
                         title={conteudoAtual?.nome}
                         subtitle={conteudoAtual?.descricao}
                         variant="detail"
                         isCommunity={abaComunidade}
-                        professorName={conteudoAtual?.professor?.name || conteudoAtual?.user?.name || "Professor Acadêmico massa demais de sousa"}
+                        professorName={conteudoAtual?.professor || "Professor"}
                     />
                 </div>
 

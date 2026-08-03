@@ -37,7 +37,7 @@ export function ContentCard({ title, subtitle, onAction, variant = "default", pr
                 </div>
                 <div className="flex flex-col items-start min-w-0 flex-1">
                     <div className="flex items-center gap-3 w-full justify-start">
-                        <p className="text-xl font-bold wrap-break-word text-gray-800">
+                        <p className="text-xl font-bold [overflow-wrap:anywhere] text-gray-800">
                             {title}
                         </p>
                         {variant === "default" && professorName && isCommunity && (
@@ -49,8 +49,7 @@ export function ContentCard({ title, subtitle, onAction, variant = "default", pr
                     <p 
                         ref={textoRef}
                         className={`
-                            text-base text-[#767474] font-bold
-                            wrap-break-word text-justify pt-2
+                            text-base text-[#767474] font-bold [overflow-wrap:anywhere] text-justify pt-2
                             ${expandido ? "" : (variant === "detail" ? "line-clamp-2" : "line-clamp-1")}
                         `}
                     >

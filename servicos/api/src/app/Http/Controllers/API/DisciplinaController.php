@@ -58,9 +58,12 @@ class DisciplinaController extends BaseController
     {
         $disciplina = Disciplina::where('dono_id', auth()->id())
             ->withCount('conteudos')
-            ->with(['aulas' => function($query) {
-                $query->orderBy('id', 'desc');
-            }])
+            ->with([
+                'aulas' => function ($query) {
+                    $query->withCount('conteudos')
+                        ->orderBy('id', 'desc');
+                }
+            ])
             ->find($id);
 
         if (is_null($disciplina)) {

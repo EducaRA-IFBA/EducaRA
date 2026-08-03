@@ -22,7 +22,15 @@ class ConteudoResource extends JsonResource
             'filehash' => $this->filehash,
             'objeto' => $this->caminho,
             'extension'=> $this->extension,
-            'professor' => $this->aula->dono->name ?? 'Professor',
+            'professor' => $this->aula?->dono?->name ?? 'Professor',
+            'aula' => [
+                'id' => $this->aula?->id,
+                'nome' => $this->aula?->nome,
+            ],
+            'disciplina' => [
+                'id' => $this->aula?->disciplina?->id,
+                'nome' => $this->aula?->disciplina?->nome,
+            ],
             'caminho' => "{$this->id}/{$this->caminho}",
             'created_at' => $this->created_at->format('Y-m-d\TH:i:s\Z'),
             'updated_at' => $this->updated_at->format('Y-m-d\TH:i:s\Z'),
